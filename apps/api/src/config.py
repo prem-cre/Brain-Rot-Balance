@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     allowed_origins: str = "chrome-extension://*"
     default_wallet_minutes: int = 50
     max_wallet_minutes: int = 180
+    database_url: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
@@ -21,3 +22,5 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+

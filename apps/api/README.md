@@ -28,3 +28,13 @@ Open `http://127.0.0.1:8000/docs` for interactive API documentation.
 ## Production evolution
 
 The repository interfaces in `src/repositories.py` are the seam for PostgreSQL/SQLModel persistence. The `VideoIntelligenceService` is the seam for transcript retrieval, sentence-transformer embeddings, and optional LLM classification. Keep those providers out of route handlers so local development remains free and reliable.
+
+## Neon PostgreSQL setup
+
+1. Copy `.env.example` to `.env`.
+2. Put the Neon pooled connection string in `DATABASE_URL` and keep the file uncommitted.
+3. Install dependencies with `pip install -e ".[dev]"`.
+4. Run migrations with `alembic upgrade head` from `apps/api`.
+5. Start the API with `uvicorn src.main:app --reload`.
+
+The extension must call FastAPI; it must never contain the Neon connection string.

@@ -15,3 +15,6 @@ apps/extension/.plasmo/
 apps/extension/dist/
 apps/api/__pycache__/
 apps/api/.venv/
+
+apps/api/.env
+apps/api/alembic/versions/__pycache__/
