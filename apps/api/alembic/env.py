@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import asyncio
 import os
 from logging.config import fileConfig
@@ -7,6 +8,8 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.models.database import Base
+
+load_dotenv()
 
 config = context.config
 if config.config_file_name:
@@ -40,3 +43,5 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     asyncio.run(run_async_migrations())
+
+

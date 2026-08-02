@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
 from .repositories import MemoryRepository
+from .postgres_repository import PostgresRepository
 from .routes import analytics, health, vault, videos, wallet
 from .services.analytics import AnalyticsService
 from .services.learning import LearningVerificationService
@@ -15,7 +16,8 @@ from .services.wallet import WalletService
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
-    repository = MemoryRepository(wallet_limit=settings.default_wallet_minutes)
+    repository = (PostgresRepository(settings.database_url, settings.default_wallet_minutes)
+                  if settings.database_url else MemoryRepository(wallet_limit=settings.default_wallet_minutes))
     app.state.repository = repository
     app.state.video_intelligence = VideoIntelligenceService()
     app.state.wallet = WalletService(repository, max_minutes=settings.max_wallet_minutes)
@@ -45,3 +47,5 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+

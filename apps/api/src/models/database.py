@@ -68,6 +68,9 @@ class WatchSession(Base):
     active_seconds: Mapped[int] = mapped_column(Integer, default=0)
     max_position_seconds: Mapped[int] = mapped_column(Integer, default=0)
     completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    last_heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    tab_focus_ratio: Mapped[float] = mapped_column(default=1.0)
+    playback_speed: Mapped[float] = mapped_column(default=1.0)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
@@ -81,3 +84,18 @@ class VaultItem(Base):
     priority: Mapped[int] = mapped_column(Integer, default=3)
     status: Mapped[str] = mapped_column(String(20), default="queued")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+
+
+class DailyAnalytics(Base):
+    __tablename__ = "daily_analytics"
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
+    user_id: Mapped[str] = mapped_column(UUID(as_uuid=False), index=True)
+    date: Mapped[str] = mapped_column(String(10), index=True)
+    learning_minutes: Mapped[int] = mapped_column(Integer, default=0)
+    entertainment_minutes: Mapped[int] = mapped_column(Integer, default=0)
+    videos_completed: Mapped[int] = mapped_column(Integer, default=0)
+    learning_confidence: Mapped[int] = mapped_column(Integer, default=0)
+    streak_days: Mapped[int] = mapped_column(Integer, default=0)
+    topics: Mapped[list] = mapped_column(JSONB, default=list)

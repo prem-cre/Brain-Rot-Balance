@@ -11,6 +11,9 @@ class WalletService:
         self.repository = repository
         self.max_minutes = max_minutes
 
+    def get_wallet(self) -> Wallet:
+        return self.reset_if_new_day()
+
     def spend_for_session(self, session: Session, minutes: int) -> Wallet:
         wallet = self.repository.get_wallet()
         if session.kind.value == "learning":
@@ -38,3 +41,4 @@ class WalletService:
             wallet.focus_mode = False
             self.repository.save_wallet(wallet)
         return wallet
+
