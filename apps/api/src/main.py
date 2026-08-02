@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from .config import get_settings
+from .identity import set_device_id, validate_device_id
 from .repositories import MemoryRepository
 from .postgres_repository import PostgresRepository
 from .routes import analytics, health, vault, videos, wallet
@@ -32,6 +34,13 @@ def create_app() -> FastAPI:
                   description="Behavior-aware learning and entertainment balance for YouTube.")
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins,
                        allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
+    @app.middleware("http")
+    async def bind_device_identity(request: Request, call_next):
+        try:
+            set_device_id(validate_device_id(request.headers.get("X-Device-ID")))
+        except HTTPException as exc:
+            return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+        return await call_next(request)
     prefix = settings.api_v1_prefix
     app.include_router(health.router, prefix=prefix)
     app.include_router(videos.router, prefix=prefix)
@@ -47,5 +56,8 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+
 
 

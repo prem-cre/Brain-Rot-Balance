@@ -1,10 +1,13 @@
 import { defaultState } from "./mock-data.js";
+import { getDeviceId } from "./device-identity.js";
 
 const STORAGE_KEY = "brain_rot_balance_state";
 
 function hasChromeStorage() {
   return typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
 }
+
+export { getDeviceId };
 
 export async function getState() {
   if (hasChromeStorage()) {
@@ -31,3 +34,4 @@ export async function setState(nextState) {
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
 }
+

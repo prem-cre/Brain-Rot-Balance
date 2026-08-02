@@ -4,6 +4,7 @@ from uuid import uuid4
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session as DBSession, sessionmaker
 
+from .identity import get_device_id
 from .models.database import DailyAnalytics as DBAnalytics, User, Wallet as DBWallet, WalletLedger, Video, VideoClassification, VaultItem as DBVaultItem, WatchSession
 from .models.schemas import Classification, DailyAnalytics, Session, VaultItem, VideoInput, VideoCategory, Wallet
 
@@ -20,9 +21,9 @@ class PostgresRepository:
         self.device_id = "local-extension-device"
 
     def _user_and_wallet(self, db: DBSession) -> tuple[User, DBWallet]:
-        user = db.scalar(select(User).where(User.device_id == self.device_id))
+        user = db.scalar(select(User).where(User.device_id == get_device_id()))
         if user is None:
-            user = User(device_id=self.device_id)
+            user = User(device_id=get_device_id())
             db.add(user)
             db.flush()
         wallet = db.get(DBWallet, user.id)
@@ -177,3 +178,4 @@ class PostgresRepository:
             row.streak_days = value.streak_days
             row.topics = value.topics
         return value.model_copy(deep=True)
+
