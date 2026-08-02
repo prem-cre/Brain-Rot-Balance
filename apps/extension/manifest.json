@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Brain-Rot Balance",
+  "description": "Learn first. Enjoy guilt-free entertainment later.",
+  "version": "0.1.0",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Brain-Rot Balance",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "src/content/youtube-overlay.js"
+      ],
+      "css": [
+        "src/styles/theme.css",
+        "src/content/youtube-overlay.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

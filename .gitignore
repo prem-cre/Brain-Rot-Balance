@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.next/
+.turbo/
+coverage/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+apps/extension/.plasmo/
+apps/extension/dist/
+apps/api/__pycache__/
+apps/api/.venv/
