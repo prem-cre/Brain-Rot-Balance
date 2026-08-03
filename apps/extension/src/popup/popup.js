@@ -1,4 +1,5 @@
 import { getState } from "../lib/storage.js";
+import { getDashboard } from "../lib/api.js";
 
 function renderVault(items) {
   return items
@@ -38,7 +39,8 @@ async function openDashboard() {
 }
 
 async function initPopup() {
-  const state = await getState();
+  const fallbackState = await getState();
+  const state = await loadState(fallbackState);
   const root = document.getElementById("popup-root");
 
   root.innerHTML = `
@@ -127,4 +129,46 @@ async function initPopup() {
     .addEventListener("click", openDashboard);
 }
 
+async function loadState(fallbackState) {
+  try {
+    const dashboard = await getDashboard();
+    return dashboardToPopupState(dashboard, fallbackState);
+  } catch (error) {
+    console.info("Using offline dashboard data:", error.message);
+    return fallbackState;
+  }
+}
+
+function dashboardToPopupState(dashboard, fallbackState) {
+  const wallet = dashboard.wallet;
+  const session = dashboard.current_session;
+  const analytics = dashboard.analytics;
+  const currentVideo = session?.video;
+  const classification = session?.classification;
+
+  return {
+    wallet: {
+      remainingMinutes: wallet.remaining_minutes,
+      learningConfidence: analytics.learning_confidence / 100,
+      streakDays: analytics.streak_days,
+      focusMode: wallet.focus_mode,
+    },
+    session: {
+      currentVideo: currentVideo
+        ? { title: currentVideo.title, channel: currentVideo.channel_name || "YouTube", educationScore: classification.education_score, entertainmentScore: classification.entertainment_score }
+        : fallbackState.session.currentVideo,
+      prediction: wallet.focus_mode
+        ? "Your entertainment wallet is empty. Complete a learning video to unlock more time."
+        : "Your wallet is available. Keep your next session intentional.",
+      detectedIntent: session?.kind || fallbackState.session.detectedIntent,
+    },
+    vault: dashboard.vault.map((item) => ({ title: item.video.title, meta: item.goal, reward: `${item.priority}/5 priority` })),
+    insights: [
+      { label: "Learning", value: `${analytics.learning_minutes}m`, tone: "green" },
+      { label: "Entertainment", value: `${analytics.entertainment_minutes}m`, tone: "orange" },
+      { label: "Completed", value: analytics.videos_completed, tone: "blue" },
+      { label: "Topics", value: analytics.topics.length, tone: "purple" },
+    ],
+  };
+}
 initPopup();
