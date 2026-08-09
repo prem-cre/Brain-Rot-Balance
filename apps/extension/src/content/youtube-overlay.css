@@ -5,12 +5,15 @@
   width: 320px;
   z-index: 2147483647;
   color: var(--text-primary);
-  background: var(--surface-glass);
-  border: 1px solid var(--border-strong);
+  background: rgba(18, 22, 34, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
-  box-shadow: var(--shadow-panel);
-  backdrop-filter: blur(18px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .brb-floating-panel * {
@@ -33,13 +36,32 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 6px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   font-size: 11px;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.brb-badge--edu {
+  background: rgba(45, 212, 191, 0.15);
+  color: #2dd4bf;
+  border: 1px solid rgba(45, 212, 191, 0.3);
+}
+
+.brb-badge--ent {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.brb-badge--focus {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
 .brb-meter {
@@ -52,7 +74,8 @@
 .brb-meter-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #8bf7c4 0%, #ffd66b 58%, #ff8d70 100%);
+  background: linear-gradient(90deg, #2dd4bf 0%, #fbbf24 50%, #fb7185 100%);
+  transition: width 0.4s ease;
 }
 
 .brb-floating-grid {
@@ -62,16 +85,16 @@
 }
 
 .brb-mini-stat {
-  border-radius: 18px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .brb-mini-stat strong {
   display: block;
-  font-size: 16px;
-  margin-top: 6px;
+  font-size: 15px;
+  margin-top: 4px;
 }
 
 .brb-cta {
@@ -80,9 +103,93 @@
   align-items: center;
   width: 100%;
   padding: 12px 14px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ff735c 0%, #ffb86b 100%);
-  color: #211814;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+  color: #0f172a;
   font-weight: 700;
+  font-size: 13px;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
+
+.brb-cta:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.brb-cta--vault {
+  background: linear-gradient(135deg, #2dd4bf 0%, #34d399 100%);
+  color: #064e3b;
+}
+
+/* Focus Mode Overlay Rules for YouTube */
+body.brb-focus-mode-active #related,
+body.brb-focus-mode-active ytd-watch-next-secondary-results-renderer,
+body.brb-focus-mode-active ytd-rich-grid-renderer {
+  filter: blur(14px) grayscale(0.5);
+  pointer-events: none;
+  opacity: 0.25;
+  transition: filter 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+/* Shorts Blocker Modal */
+.brb-shorts-blocker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2147483646;
+  background: rgba(10, 14, 23, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #f8fafc;
+  text-align: center;
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.brb-shorts-blocker-card {
+  max-width: 480px;
+  padding: 36px;
+  border-radius: 28px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+.brb-shorts-blocker-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px auto;
+  border-radius: 20px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.brb-shorts-blocker-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brb-shorts-blocker-body {
+  font-size: 15px;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
