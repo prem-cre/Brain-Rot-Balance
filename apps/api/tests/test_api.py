@@ -47,4 +47,47 @@ def test_wallet_boost_endpoint():
         assert data["remaining_minutes"] >= 50
         assert data["earned_minutes"] >= 5
 
+def test_add_to_vault_educational_success():
+    with TestClient(app) as client:
+        payload = {
+            "video": {
+                "video_id": "edu-123",
+                "title": "Python Programming Course Tutorial for Beginners",
+                "description": "Learn python step by step algorithm and data structures.",
+                "duration_seconds": 1200
+            },
+            "priority": 4,
+            "goal": "Master Python"
+        }
+        response = client.post(
+            "/api/v1/vault",
+            json=payload,
+            headers={"X-Device-ID": "test-device-123"}
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["video"]["video_id"] == "edu-123"
+
+def test_add_to_vault_entertainment_rejected():
+    with TestClient(app) as client:
+        payload = {
+            "video": {
+                "video_id": "ent-999",
+                "title": "Funniest Gaming Pranks and Meme Compilation",
+                "description": "Hilarious reaction and viral gaming video.",
+                "duration_seconds": 600
+            },
+            "priority": 3,
+            "goal": "Entertainment"
+        }
+        response = client.post(
+            "/api/v1/vault",
+            json=payload,
+            headers={"X-Device-ID": "test-device-123"}
+        )
+        assert response.status_code == 422
+        detail = response.json()["detail"]
+        assert "Cannot add to Learning Vault" in detail
+        assert "classified as Entertainment" in detail
+
 

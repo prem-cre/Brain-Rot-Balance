@@ -66,6 +66,47 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (message?.type === "ADD_TO_VAULT" && message.payload) {
+    (async () => {
+      const state = await getStoredState();
+      const item = message.payload;
+      const titleLower = (item.title || "").toLowerCase();
+
+      // Pre-validation logic for educational vs entertainment
+      const isEnt = titleLower.includes("prank") || titleLower.includes("meme") || titleLower.includes("funny") || titleLower.includes("reaction") || titleLower.includes("gaming") || titleLower.includes("compilation") || titleLower.includes("viral");
+      const isEdu = !isEnt && (titleLower.includes("explain") || titleLower.includes("tutorial") || titleLower.includes("deep dive") || titleLower.includes("course") || titleLower.includes("how to") || titleLower.includes("architecture") || titleLower.includes("react") || titleLower.includes("docker") || titleLower.includes("python") || item.educationScore >= 50);
+
+      if (!isEdu || isEnt) {
+        const funScore = item.entertainmentScore || 85;
+        const eduScore = item.educationScore || 15;
+        sendResponse({
+          ok: false,
+          warning: `Cannot add to Learning Vault: Content is classified as Entertainment (Entertainment score: ${funScore}%, Education score: ${eduScore}%). Only educational videos can be added to your Learning Vault.`
+        });
+        return;
+      }
+
+      state.vault = state.vault || [];
+      const exists = state.vault.some((v) => v.videoId === item.videoId || v.title === item.title);
+
+      if (!exists) {
+        state.vault.unshift({
+          id: `vault-${Date.now()}`,
+          title: item.title,
+          meta: `${item.channel || "YouTube"} · Edu ${item.educationScore || 85}%`,
+          reward: "+20 min",
+          videoId: item.videoId,
+          watchUrl: item.watchUrl || `https://www.youtube.com/watch?v=${item.videoId}`
+        });
+        await saveStoredState(state);
+        await notifyTabs(state);
+      }
+
+      sendResponse({ ok: true, state, message: "Added to Learning Vault!" });
+    })();
+    return true;
+  }
+
   if (message?.type === "TELEMETRY_TICK" && message.payload) {
     (async () => {
       const payload = message.payload;

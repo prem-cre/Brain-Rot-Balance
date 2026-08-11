@@ -216,6 +216,32 @@ function showMintedToast(amount = 1, message = null) {
   }, 4000);
 }
 
+function showWarningToast(message) {
+  let toast = document.getElementById("brb-warning-toast");
+  if (toast) toast.remove();
+
+  toast = document.createElement("div");
+  toast.id = "brb-warning-toast";
+  toast.className = "brb-mint-toast brb-toast--warning";
+  toast.innerHTML = `
+    <span class="brb-toast-icon">⚠️</span>
+    <div style="max-width:300px;">
+      <strong style="color:#fb7185;">Vault Rejection Warning</strong>
+      <small style="color:#fecdd3; display:block; margin-top:2px; font-size:11px; line-height:1.4;">${message}</small>
+    </div>
+  `;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("brb-toast-show");
+  }, 50);
+
+  setTimeout(() => {
+    toast.classList.remove("brb-toast-show");
+    setTimeout(() => toast.remove(), 400);
+  }, 6000);
+}
+
 function toggleVaultDrawer(state) {
   let drawer = document.getElementById(VAULT_DRAWER_ID);
   if (drawer) {
@@ -340,9 +366,14 @@ function buildPanel(state, mintingProgress = 0) {
           <strong>🔥 ${state.wallet.streakDays || 1} Days</strong>
         </div>
       </div>
-      <button id="brb-open-dash-btn" class="brb-cta ${isFocusMode ? "brb-cta--vault" : ""}">
-        ${isFocusMode ? "🎓 Open Learning Vault" : "Open Focus Dashboard"}
-      </button>
+      <div style="display:grid; gap:6px;">
+        <button id="brb-open-dash-btn" class="brb-cta ${isFocusMode ? "brb-cta--vault" : ""}">
+          ${isFocusMode ? "🎓 Open Learning Vault" : "Open Focus Dashboard"}
+        </button>
+        <button id="brb-add-vault-btn" class="brb-cta-sub" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; border-radius:12px; padding:8px; font-size:11px; font-weight:600; cursor:pointer;">
+          ➕ Add Video to Vault
+        </button>
+      </div>
     </div>
   `;
 
@@ -354,6 +385,25 @@ function buildPanel(state, mintingProgress = 0) {
     } else {
       chrome.runtime.sendMessage({ type: "OPEN_DASHBOARD" });
     }
+  });
+
+  document.getElementById("brb-add-vault-btn")?.addEventListener("click", async () => {
+    const videoInfo = extractVideoInfo();
+    if (!videoInfo || !videoInfo.title) return;
+    try {
+      const res = await chrome.runtime.sendMessage({
+        type: "ADD_TO_VAULT",
+        payload: videoInfo
+      });
+      if (res && res.ok) {
+        showMintedToast(0, "✅ Added to Learning Vault!");
+        if (res.state) {
+          buildPanel(res.state, currentMintingProgress);
+        }
+      } else if (res && res.warning) {
+        showWarningToast(res.warning);
+      }
+    } catch (e) {}
   });
 }
 
