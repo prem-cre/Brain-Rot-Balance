@@ -36,4 +36,15 @@ def test_video_classification_service():
     assert res.classification.education_score >= 40
     assert res.classification.category.value in ["education", "mixed"]
 
+def test_wallet_boost_endpoint():
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/v1/wallet/boost?minutes=5",
+            headers={"X-Device-ID": "test-device-123"}
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["remaining_minutes"] >= 50
+        assert data["earned_minutes"] >= 5
+
 

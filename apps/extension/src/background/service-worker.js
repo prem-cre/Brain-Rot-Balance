@@ -43,6 +43,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (message?.type === "CLAIM_BOOSTER") {
+    (async () => {
+      const state = await getStoredState();
+      const bonusMinutes = message.minutes || 5;
+      state.wallet.remainingMinutes = Math.min(
+        state.wallet.totalMinutes,
+        (state.wallet.remainingMinutes || 0) + bonusMinutes
+      );
+      state.wallet.earnedMinutes = (state.wallet.earnedMinutes || 0) + bonusMinutes;
+      state.dailyStats = state.dailyStats || {};
+      state.dailyStats.learningMinutes = (state.dailyStats.learningMinutes || 0) + bonusMinutes;
+
+      if (state.wallet.remainingMinutes > 0) {
+        state.wallet.focusMode = false;
+      }
+
+      await saveStoredState(state);
+      await notifyTabs(state);
+      sendResponse({ ok: true, state, claimedMinutes: bonusMinutes });
+    })();
+    return true;
+  }
+
   if (message?.type === "TELEMETRY_TICK" && message.payload) {
     (async () => {
       const payload = message.payload;
@@ -61,10 +84,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
       }
 
-      // Basic heuristic score if not yet classified
+      // Check if video is educational (high score, keyword match, or vault match)
       const titleLower = (payload.title || "").toLowerCase();
-      const isEdu = titleLower.includes("explain") || titleLower.includes("tutorial") || titleLower.includes("deep dive") || titleLower.includes("course") || titleLower.includes("how to") || titleLower.includes("architecture");
-      const eduScore = isEdu ? 88 : (payload.isShorts ? 15 : 35);
+      const isVaultVideo = (state.vault || []).some(
+        (v) => v.videoId === videoId || (v.watchUrl && v.watchUrl.includes(videoId))
+      );
+      const isEdu = isVaultVideo || titleLower.includes("explain") || titleLower.includes("tutorial") || titleLower.includes("deep dive") || titleLower.includes("course") || titleLower.includes("how to") || titleLower.includes("architecture") || titleLower.includes("react") || titleLower.includes("docker") || titleLower.includes("python");
+      const eduScore = isEdu ? (isVaultVideo ? 95 : 88) : (payload.isShorts ? 15 : 35);
 
       state.session = state.session || {};
       state.session.currentVideo = {
@@ -72,8 +98,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         channel: payload.channel || "YouTube Channel",
         educationScore: eduScore,
         entertainmentScore: 100 - eduScore,
-        status: isEdu ? "Learning-positive" : "Entertainment"
+        status: isEdu ? "Learning-positive" : "Entertainment",
+        isVaultVideo: isVaultVideo
       };
+
+      state.dailyStats = state.dailyStats || { learningMinutes: 0, entertainmentMinutes: 0, focusMinutes: 0, knowledgeScore: 85 };
+
+      let mintedJustNow = false;
+      let earnedAmount = 0;
 
       // Wallet Accounting Every 60 Seconds of Viewing Time
       if (counter.secondsWatched >= 60) {
@@ -83,11 +115,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           // Educational Content - Earn Minutes
           const focusRatio = counter.secondsFocused / 60;
           const confidence = Math.min(1.0, 0.5 + focusRatio * 0.5);
-          const earned = Math.round(1 * confidence);
+          earnedAmount = Math.max(1, Math.round(1 * confidence));
           
-          state.wallet.remainingMinutes = Math.min(state.wallet.totalMinutes, state.wallet.remainingMinutes + earned);
-          state.wallet.earnedMinutes = (state.wallet.earnedMinutes || 0) + earned;
+          state.wallet.remainingMinutes = Math.min(
+            state.wallet.totalMinutes,
+            state.wallet.remainingMinutes + earnedAmount
+          );
+          state.wallet.earnedMinutes = (state.wallet.earnedMinutes || 0) + earnedAmount;
           state.dailyStats.learningMinutes = (state.dailyStats.learningMinutes || 0) + 1;
+          mintedJustNow = true;
+          counter.secondsFocused = 0;
         } else {
           // Entertainment Content - Consume Minutes
           state.wallet.remainingMinutes = Math.max(0, state.wallet.remainingMinutes - 1);
@@ -95,10 +132,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           state.dailyStats.entertainmentMinutes = (state.dailyStats.entertainmentMinutes || 0) + 1;
         }
 
-        // Focus mode trigger
+        // Focus mode trigger / reset
         if (state.wallet.remainingMinutes <= 0) {
           state.wallet.focusMode = true;
-        } else if (state.wallet.remainingMinutes > 5) {
+        } else if (state.wallet.remainingMinutes > 0) {
           state.wallet.focusMode = false;
         }
 
@@ -106,7 +143,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         notifyTabs(state);
       }
 
-      sendResponse({ ok: true, state });
+      // Calculate progress towards next minute (0 - 100%)
+      const mintingProgress = isEdu ? Math.min(100, Math.round((counter.secondsWatched / 60) * 100)) : 0;
+
+      sendResponse({
+        ok: true,
+        state,
+        mintingProgress,
+        mintedJustNow,
+        earnedAmount,
+        isEducational: isEdu
+      });
     })();
 
     return true; // Keep message channel open for async response

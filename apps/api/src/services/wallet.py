@@ -31,6 +31,9 @@ class WalletService:
         wallet.focus_mode = wallet.remaining_minutes <= 0
         return self.repository.save_wallet(wallet)
 
+    def boost_wallet(self, boost_minutes: int = 5) -> Wallet:
+        return self.reward_learning(boost_minutes)
+
     def reset_if_new_day(self) -> Wallet:
         wallet = self.repository.get_wallet()
         today = datetime.now(timezone.utc).date().isoformat()

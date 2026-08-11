@@ -30,19 +30,25 @@ export const defaultState = {
       id: "vault-1",
       title: "Docker Networking Deep Dive",
       meta: "28 min · Systems",
-      reward: "+24 min"
+      reward: "+24 min",
+      videoId: "0O1w65c6c0E",
+      watchUrl: "https://www.youtube.com/watch?v=0O1w65c6c0E"
     },
     {
       id: "vault-2",
       title: "React Hooks Through Real Examples",
       meta: "19 min · Frontend",
-      reward: "+18 min"
+      reward: "+18 min",
+      videoId: "TNhaISOUy6Q",
+      watchUrl: "https://www.youtube.com/watch?v=TNhaISOUy6Q"
     },
     {
       id: "vault-3",
       title: "Binary Search Trees Without Memorizing",
       meta: "24 min · DSA",
-      reward: "+22 min"
+      reward: "+22 min",
+      videoId: "fAAZ2rCfc18",
+      watchUrl: "https://www.youtube.com/watch?v=fAAZ2rCfc18"
     }
   ],
   insights: [
