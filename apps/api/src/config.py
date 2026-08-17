@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     default_wallet_minutes: int = 50
     max_wallet_minutes: int = 180
     database_url: str | None = None
+    groq_api_key: str | None = None
+    groq_model: str = "llama-3.1-8b-instant"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

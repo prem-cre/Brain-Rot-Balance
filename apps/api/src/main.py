@@ -8,9 +8,10 @@ from .config import get_settings
 from .identity import set_device_id, validate_device_id
 from .repositories import MemoryRepository
 from .postgres_repository import PostgresRepository
-from .routes import analytics, dashboard, health, vault, videos, wallet
+from .routes import analytics, dashboard, health, quiz, vault, videos, wallet
 from .services.analytics import AnalyticsService
 from .services.learning import LearningVerificationService
+from .services.quiz import GroqQuizService
 from .services.video_intelligence import VideoIntelligenceService
 from .services.wallet import WalletService
 
@@ -24,6 +25,7 @@ async def lifespan(app: FastAPI):
     app.state.video_intelligence = VideoIntelligenceService()
     app.state.wallet = WalletService(repository, max_minutes=settings.max_wallet_minutes)
     app.state.learning = LearningVerificationService(repository, app.state.wallet)
+    app.state.quiz_service = GroqQuizService(api_key=settings.groq_api_key, model=settings.groq_model)
     app.state.analytics = AnalyticsService(repository)
     yield
 
@@ -48,6 +50,7 @@ def create_app() -> FastAPI:
     app.include_router(vault.router, prefix=prefix)
     app.include_router(analytics.router, prefix=prefix)
     app.include_router(dashboard.router, prefix=prefix)
+    app.include_router(quiz.router, prefix=prefix)
 
     @app.get("/", tags=["system"])
     def root() -> dict[str, str]:

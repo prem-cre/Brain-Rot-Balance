@@ -90,4 +90,25 @@ def test_add_to_vault_entertainment_rejected():
         assert "Cannot add to Learning Vault" in detail
         assert "classified as Entertainment" in detail
 
+def test_generate_micro_quiz_endpoint():
+    with TestClient(app) as client:
+        payload = {
+            "video_id": "test-react-vid",
+            "title": "React 19 Hooks and Component State Tutorial",
+            "description": "Deep dive into useEffect and state architecture."
+        }
+        response = client.post(
+            "/api/v1/learning/quiz",
+            json=payload,
+            headers={"X-Device-ID": "test-device-123"}
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["options"]) == 4
+        assert 0 <= data["correct_index"] < 4
+        assert data["bonus_minutes"] == 5
+        assert "question" in data
+        assert "explanation" in data
+
+
 

@@ -28,27 +28,27 @@ export const defaultState = {
   vault: [
     {
       id: "vault-1",
-      title: "Docker Networking Deep Dive",
-      meta: "28 min · Systems",
-      reward: "+24 min",
+      title: "System Design Deep Dive: Architecture Patterns",
+      meta: "28 min • Systems Architecture",
+      reward: "+1 min per 5m",
       videoId: "0O1w65c6c0E",
-      watchUrl: "https://www.youtube.com/watch?v=0O1w65c6c0E"
+      watchUrl: "https://www.youtube.com/results?search_query=System+Design+Deep+Dive+Architecture"
     },
     {
       id: "vault-2",
-      title: "React Hooks Through Real Examples",
-      meta: "19 min · Frontend",
-      reward: "+18 min",
+      title: "React 19 & Next.js Full Course",
+      meta: "19 min • Frontend Dev",
+      reward: "+1 min per 5m",
       videoId: "TNhaISOUy6Q",
-      watchUrl: "https://www.youtube.com/watch?v=TNhaISOUy6Q"
+      watchUrl: "https://www.youtube.com/results?search_query=React+19+Tutorial+Full+Course"
     },
     {
       id: "vault-3",
-      title: "Binary Search Trees Without Memorizing",
-      meta: "24 min · DSA",
-      reward: "+22 min",
+      title: "Data Structures & Algorithms in Python",
+      meta: "24 min • DSA Mastery",
+      reward: "+1 min per 5m",
       videoId: "fAAZ2rCfc18",
-      watchUrl: "https://www.youtube.com/watch?v=fAAZ2rCfc18"
+      watchUrl: "https://www.youtube.com/results?search_query=NeetCode+Data+Structures+Algorithms+Python"
     }
   ],
   insights: [
