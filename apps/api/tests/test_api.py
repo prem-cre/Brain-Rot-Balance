@@ -110,5 +110,58 @@ def test_generate_micro_quiz_endpoint():
         assert "question" in data
         assert "explanation" in data
 
+def test_ml_classifier_endpoint():
+    with TestClient(app) as client:
+        edu_payload = {
+            "title": "System Design: Building Scalable Microservices with Kafka",
+            "description": "Learn event driven architecture patterns.",
+            "channel": "Tech With Tim"
+        }
+        res = client.post("/api/v1/ml/classify", json=edu_payload)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["is_educational"] is True
+        assert data["education_score"] >= 60
+        assert data["p_education"] > data["p_entertainment"]
+        assert len(data["top_salient_terms"]) > 0
+
+        ent_payload = {
+            "title": "Sidemen $10,000,000 Luxury House Hide and Seek Challenge",
+            "description": "Funniest moments and gaming highlights.",
+            "channel": "Sidemen"
+        }
+        res_ent = client.post("/api/v1/ml/classify", json=ent_payload)
+        assert res_ent.status_code == 200
+        data_ent = res_ent.json()
+        assert data_ent["is_educational"] is False
+        assert data_ent["entertainment_score"] >= 60
+
+def test_rl_habit_policy_and_feedback():
+    with TestClient(app) as client:
+        context = {
+            "streak_days": 14,
+            "spent_minutes_today": 45,
+            "total_budget_minutes": 50,
+            "quiz_pass_rate": 0.9,
+            "completion_rate": 0.85
+        }
+        res = client.post("/api/v1/ml/habit-policy", json=context)
+        assert res.status_code == 200
+        policy = res.json()
+        assert "action_id" in policy
+        assert "reward_ratio_seconds" in policy
+        assert policy["reward_ratio_seconds"] in [200, 240, 300]
+        assert "recommendation_rationale" in policy
+
+        feedback_payload = {
+            "context": context,
+            "action_id": policy["action_id"],
+            "reward": 1.0
+        }
+        fb_res = client.post("/api/v1/ml/habit-feedback", json=feedback_payload)
+        assert fb_res.status_code == 200
+        assert fb_res.json()["status"] == "updated"
+
+
 
 

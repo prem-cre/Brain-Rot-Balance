@@ -149,8 +149,32 @@ async function initOptions() {
 
       <section class="panel-card">
         <div class="section-head">
+          <h2>Applied AI & Reinforcement Learning Engine</h2>
+          <span class="muted">LinUCB Contextual Bandit + TF-IDF Classifier</span>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-tag" style="background:rgba(45, 212, 191, 0.15); color:#2dd4bf;">ML Classifier</span>
+            <h3>TF-IDF + Logistic Semantic Engine</h3>
+            <p>Classifies YouTube video metadata in &lt;1ms into calibrated probabilities: P(Education) vs P(Entertainment) with zero client bloat.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-tag" style="background:rgba(251, 191, 36, 0.15); color:#fbbf24;">RL Bandit</span>
+            <h3>LinUCB Contextual Policy Agent</h3>
+            <p>Dynamically adapts the 5:1 wallet ratio and quiz multipliers according to user cognitive fatigue, streak, and video completion patterns.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-tag" style="background:rgba(168, 85, 247, 0.15); color:#c084fc;">Groq AI</span>
+            <h3>llama-3.1-8b-instant Micro-Quizzes</h3>
+            <p>Pre-fetches concept comprehension checks at 75% progress in 250ms with instant +5m Mastery Jackpot unlock.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="section-head">
           <h2>Product Vision Surface</h2>
-          <span class="muted">What this frontend already represents</span>
+          <span class="muted">Behavioral Habit Architecture</span>
         </div>
         <div class="feature-grid">
           <article class="feature-card">

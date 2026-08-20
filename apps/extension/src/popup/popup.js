@@ -92,10 +92,10 @@ async function initPopup() {
       <article class="panel-card panel-card--soft">
         <div class="row-between">
           <div>
-            <div class="eyebrow">Behavior prediction</div>
-            <p class="body-copy">${state.session.prediction}</p>
+            <div class="eyebrow">Adaptive RL Habit Policy</div>
+            <p class="body-copy">${state.policy?.rationale || "LinUCB Contextual Bandit: 5:1 Learning Ratio active."}</p>
           </div>
-          <span class="intent-pill">${state.session.detectedIntent}</span>
+          <span class="intent-pill" style="background:rgba(45, 212, 191, 0.15); color:#2dd4bf; border:1px solid rgba(45, 212, 191, 0.3); font-weight:700;">${state.policy?.name || "Standard 5:1"}</span>
         </div>
       </article>
 

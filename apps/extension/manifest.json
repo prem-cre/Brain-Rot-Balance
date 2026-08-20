@@ -5,8 +5,14 @@
   "version": "0.1.0",
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "alarms"
   ],
+  "icons": {
+    "16": "public/icons/icon16.png",
+    "48": "public/icons/icon48.png",
+    "128": "public/icons/icon128.png"
+  },
   "host_permissions": [
     "https://www.youtube.com/*",
     "http://127.0.0.1:8000/*",
@@ -18,7 +24,12 @@
   },
   "action": {
     "default_title": "Brain-Rot Balance",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "public/icons/icon16.png",
+      "48": "public/icons/icon48.png",
+      "128": "public/icons/icon128.png"
+    }
   },
   "options_page": "options.html",
   "content_scripts": [

@@ -89,9 +89,53 @@ function parseYouTubeUrl(input) {
   };
 }
 
+async function checkAndPerformDailyReset(state) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (!state.lastActiveDate) {
+    state.lastActiveDate = today;
+    await saveStoredState(state);
+    return state;
+  }
+
+  if (state.lastActiveDate !== today) {
+    const yesterdayLearned = (state.dailyStats?.learningMinutes || 0) >= 10;
+    if (yesterdayLearned) {
+      state.wallet.streakDays = (state.wallet.streakDays || 0) + 1;
+    }
+
+    state.wallet.remainingMinutes = state.wallet.totalMinutes || 50;
+    state.wallet.spentMinutes = 0;
+    state.wallet.earnedMinutes = 0;
+    state.wallet.focusMode = false;
+    state.dailyStats = {
+      learningMinutes: 0,
+      entertainmentMinutes: 0,
+      focusMinutes: 0,
+      knowledgeScore: 88
+    };
+    state.lastActiveDate = today;
+    await saveStoredState(state);
+    await notifyTabs(state);
+  }
+  return state;
+}
+
 chrome.runtime.onInstalled.addListener(async () => {
-  await getStoredState();
+  const state = await getStoredState();
+  await checkAndPerformDailyReset(state);
+  if (chrome.alarms) {
+    chrome.alarms.create("DAILY_MIDNIGHT_RESET", { periodInMinutes: 30 });
+  }
 });
+
+if (chrome.alarms) {
+  chrome.alarms.onAlarm.addListener(async (alarm) => {
+    if (alarm.name === "DAILY_MIDNIGHT_RESET") {
+      const state = await getStoredState();
+      await checkAndPerformDailyReset(state);
+    }
+  });
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "OPEN_DASHBOARD") {
