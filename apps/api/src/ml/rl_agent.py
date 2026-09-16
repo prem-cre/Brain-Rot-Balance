@@ -2,7 +2,7 @@ import math
 from typing import Any
 from pydantic import BaseModel
 
-
+   
 class UserHabitContext(BaseModel):
     streak_days: int = 0
     spent_minutes_today: int = 0
