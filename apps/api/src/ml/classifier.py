@@ -6,7 +6,7 @@ from typing import Any
 from .dataset import TRAINING_CORPUS
 
 
-class LightweightMLClassifier:
+class LightweightMLClassifier:kkkk
     """Zero-dependency, high-performance TF-IDF + Logistic Classifier for video classification.
 
     Trains in <5ms, executes inference in <0.2ms with mathematical log-loss optimization.
